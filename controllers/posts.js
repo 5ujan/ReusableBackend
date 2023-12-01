@@ -1,75 +1,152 @@
-const PaidJob = require('../models/PaidJobs')
-const CommunityJob=  require('../models/CommunityJobs')
-const User=  require('../models/User')
-const { UnauthenticatedError, NotFoundError } = require('../middleware/handleErrors')
+const PaidJob = require("../models/PaidJobs");
+const CommunityJob = require("../models/CommunityJobs");
+const User = require("../models/User");
+const {
+  UnauthenticatedError,
+  NotFoundError,
+} = require("../middleware/handleErrors");
 
+const getCommunityJobs = async (req, res, next) => {
+  try {
+    const jobs = await CommunityJob.find({});
+    res.json({ jobs });
+  } catch (err) {
+    next(err);
+  }
+};
 
-const getCommunityJobs=async(req, res, next)=>{
-    const jobs = await CommunityJob.find({})
-    res.json({jobs})
-}
+const getPaidJobs = async (req, res, next) => {
+  try {
+    const jobs = await PaidJob.find({});
+    res.json({ jobs });
+  } catch (err) {
+    next(err);
+  }
+};
+const getJob = async (req, res, next) => {
+  try {
+    const job = await PaidJob.findById(req.params.jobID)|| await CommunityJob.findById(req.params.jobID);
+    res.json(job);
+  } catch (err) {
+    next(err);
+  }
+};
 
-const getPaidJobs=async(req, res, next)=>{
-    const jobs= await PaidJob.find({})
-    res.json({jobs})
-}
+const createJob = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ _id: req.user.userID });
 
-const createJob=async(req, res, next)=>{
-   const user = await User.findOne({_id:req.user.userID})
-
-   let newJob
-    if(user.isOrg===true){
-        const {title, desc}= req.body
-        newJob = await CommunityJob.create({title, desc, createdBy: user._id})
-    }
-    else{
-        const {title, desc, pay} = req.body
-        newJob= await PaidJob.create({title, desc, pay, createdBy: user._id})
+    let newJob;
+    if (user.isOrg === true) {
+      const { title, desc } = req.body;
+      newJob = await CommunityJob.create({ title, desc, createdBy: user._id });
+    } else {
+      const { title, desc, pay } = req.body;
+      newJob = await PaidJob.create({ title, desc, pay, createdBy: user._id });
     }
 
     res.status(200).json({
-        msg:"job Created", id:newJob._id
-    })
-}
+      msg: "job Created",
+      id: newJob._id,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
-const deleteJob=async(req, res, next)=>{
-    const user = await User.findOne({_id: req.user.userID})
-    const {id:jobId}= req.params
-    const job  =  await PaidJob.findOne({_id:jobId})|| await CommunityJob.findOne({_id:jobId})
-    if(job.createdBy!==req.user.userID){
-        next(new UnauthenticatedError('Not authorized to delete'))
+const deleteJob = async (req, res, next) => {
+  try {
+    const { jobID } = req.params;
+    const job =
+      (await PaidJob.findOne({ _id: jobID })) ||
+      (await CommunityJob.findOne({ _id: jobID }));
+    if (job.createdBy !== req.user.userID) {
+      next(new UnauthenticatedError("Not authorized to delete"));
+    } else {
+      (await PaidJob.findOneAndDelete({ _id: jobID })) ||
+        (await CommunityJob.findOneAndDelete({ _id: jobID }));
     }
-    else{
-        await PaidJob.findOneAndDelete({_id:jobId})|| await CommunityJob.findOneAndDelete({_id:jobId})
+    res.json({ msg: "job deleted" });
+  } catch (err) {
+    next(err);
+  }
+};
+const modifyJob = async (req, res, next) => {
+  try {
+    const { jobID } = req.params;
+
+    let job = await PaidJob.findOne({ _id: jobID });
+    if (!job) job = await CommunityJob.findOne({ _id: jobID });
+
+    if (job) {
+      if (job.createdBy !== req.user.userID) {
+        next(new UnauthenticatedError("Not authorized to modify"));
+      } else {
+        await PaidJob.findByIdAndUpdate(jobID, req.body);
+        await CommunityJob.findByIdAndUpdate(jobID, req.body);
+        res.json({ msg: "job updated" });
+      }
+    } else {
+      next(new NotFoundError("Job not found"));
     }
-    res.json({msg: "job deleted"})
+  } catch (err) {
+    next(err);
+  }
+};
 
-}
-const modifyJob=async(req, res, next)=>{
-    const user = await User.findOne({_id: req.user.userID})
-    const {id:jobId}= req.params
-    
-    let job  =  await PaidJob.findOne({_id:jobId})
-    if (!job) job=  await CommunityJob.findOne({_id:jobId})
-    console.log(job.createdBy, user._id)
-    if(job){
-
-        if(job.createdBy!==req.user.userID){
-            next(new UnauthenticatedError('Not authorized to modify'))
-        }
-        else{
-            await PaidJob.findByIdAndUpdate(jobId, req.body)
-            await CommunityJob.findByIdAndUpdate(jobId,req.body)
-            res.json({msg: "job updated"})
-        }
-    }else{
-        next(new NotFoundError('Job not found'))
+const applyToJob = async (req, res, next) => {
+  try {
+    const { jobID } = req.params;
+    let job =
+      (await PaidJob.findOne({ _id: jobID })) ||
+      (await CommunityJob.findOne({ _id: jobID }));
+    if (!job) next(new NotFoundError("invalid job id"));
+    else {
+      (await CommunityJob.findByIdAndUpdate(
+        jobID,
+        { $push: { applications: req.user.userID } },
+        { new: true }
+      )) ||
+        PaidJob.findByIdAndUpdate(
+          jobID,
+          { $push: { applications: req.user.userID } },
+          { new: true }
+        );
+      res.status(200).json({ msg: "Applied to job" });
     }
-        
-}
+  } catch (err) {
+    next(err);
+  }
+};
 
-module.exports= {getCommunityJobs, getPaidJobs, createJob, deleteJob, modifyJob}
+const closeJob = async (req, res, next) => {
+  try {
+    const { jobID } = req.params;
+    const rating = req.body.rating;
+    const job =
+      (await PaidJob.findById(jobID)) || (await CommunityJob.findById(jobID));
+    if (!job) next(new NotFoundError("Could not find job"));
+    else {
+      const userID = job.assignedTo;
+      await User.findByIdAndUpdate(
+        userID,
+        { $push: { ratings:  rating  } },
+        { new: true }
+      );
+      res.status(200).json({ msg: "Job closed" });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
 
-
-
-
+module.exports = {
+  getCommunityJobs,
+  getPaidJobs,
+  createJob,
+  deleteJob,
+  getJob,
+  modifyJob,
+  applyToJob,
+  closeJob,
+};

@@ -3,36 +3,42 @@ const {BadRequestError, NotFoundError, UnauthenticatedError} = require('../middl
 
 
 const register = async(req, res, next)=>{
-    const {name, email, password, isOrg} = req.body
-    const alreadyExists = await User.findOne({email})
-    if(alreadyExists){
-        
-        next(new BadRequestError("Account with the email already exists"))
-         
-    }else{
+    try{
+
+        const {name, email, password, isOrg} = req.body
+        const alreadyExists = await User.findOne({email})
+        if(alreadyExists){
+            
+            next(new BadRequestError("Account with the email already exists"))
+            
+        }else{
         const user= await User.create({name, email, password, isOrg})
         const token= await user.createJWT()
 
         res.json({name: user.name, token})
     }
+}catch(err){next(err)}
 }
 
 const login = async(req, res, next)=>{
-    const  {email, password } = req.body
-    const user = await User.findOne({email})
-    if(!user){
-        
-        next(new NotFoundError("Account with the email doesn't exists"));
+    try{
 
-    }else{
-        if(!user.verifyPassword(password)){
-            next(new UnauthenticatedError("Wrong password"))
+        const  {email, password } = req.body
+        const user = await User.findOne({email})
+        if(!user){
+            
+            next(new NotFoundError("Account with the email doesn't exists"));
+            
+        }else{
+            if(!user.verifyPassword(password)){
+                next(new UnauthenticatedError("Wrong password"))
+            }
+            const token = await user.createJWT()
+            res.json({name: user.name, token})
         }
-        const token = await user.createJWT()
-        res.json({name: user.name, token})
+    }catch(err){next(err)}
     }
-}
-
-
+    
+    
 
 module.exports = {register, login}

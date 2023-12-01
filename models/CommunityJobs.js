@@ -14,6 +14,20 @@ const CommunityJobSchema= new mongoose.Schema({
     createdBy:{
         type: String,
         required: true
+    },
+    images:{
+        type: [String],
+        required: false
+    },
+    completed:{
+        type: Boolean,
+        default: false
+    },
+    assignedTo:{
+        type:String,
+    },
+    applications:{
+        type:[String]
     }
 
 })
