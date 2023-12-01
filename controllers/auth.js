@@ -17,7 +17,9 @@ const register = async(req, res, next)=>{
 
         res.json({name: user.name, token})
     }
-}catch(err){next(err)}
+}catch(err){
+    console.log(err);
+    next(err)}
 }
 
 const login = async(req, res, next)=>{

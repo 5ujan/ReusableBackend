@@ -24,6 +24,7 @@ const getPaidJobs = async (req, res, next) => {
   }
 };
 const getJob = async (req, res, next) => {
+
   try {
     const job = await PaidJob.findById(req.params.jobID)|| await CommunityJob.findById(req.params.jobID);
     res.json(job);
@@ -33,25 +34,28 @@ const getJob = async (req, res, next) => {
 };
 
 const createJob = async (req, res, next) => {
-  try {
-    const user = await User.findOne({ _id: req.user.userID });
+    console.log(req.user)
+    const user = await User.findById(req.user.userID);
+    console.log(user)
+    let newJob; 
+    if(user){
 
-    let newJob;
-    if (user.isOrg === true) {
-      const { title, desc } = req.body;
-      newJob = await CommunityJob.create({ title, desc, createdBy: user._id });
-    } else {
-      const { title, desc, pay } = req.body;
-      newJob = await PaidJob.create({ title, desc, pay, createdBy: user._id });
+      if (user.isOrg === true) {
+        const { title, desc } = req.body;
+        newJob = await CommunityJob.create({ title, desc, createdBy: user._id });
+      } else {
+        const { title, desc, pay } = req.body;
+        newJob = await PaidJob.create({ title, desc, pay, createdBy: user._id });
+      }
+      
+      res.status(200).json({
+        msg: "job Created",
+        id: newJob._id,
+      });
+    }else{
+      res.status(404).json({msg:"not found"})
     }
-
-    res.status(200).json({
-      msg: "job Created",
-      id: newJob._id,
-    });
-  } catch (err) {
-    next(err);
-  }
+ 
 };
 
 const deleteJob = async (req, res, next) => {
