@@ -15,7 +15,7 @@ const register = async(req, res, next)=>{
         const user= await User.create({name, email, password, isOrg})
         const token= await user.createJWT()
 
-        res.json({name: user.name, token})
+        res.json({name: user.name, token, userID: user._id, isOrg:user.isOrg})
     }
 }catch(err){
     console.log(err);
@@ -36,7 +36,7 @@ const login = async(req, res, next)=>{
                 next(new UnauthenticatedError("Wrong password"))
             }
             const token = await user.createJWT()
-            res.json({name: user.name, token})
+            res.json({name: user.name, token, userID:user._id, isOrg:user.isOrg})
         }
     }catch(err){next(err)}
     }
