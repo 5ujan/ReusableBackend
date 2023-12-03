@@ -15,8 +15,8 @@ const CommunityJobSchema= new mongoose.Schema({
         type: String,
         required: true
     },
-    images:{
-        type: [String],
+    image:{
+        type: String,
         required: false
     },
     completed:{

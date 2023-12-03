@@ -19,8 +19,8 @@ const PaidJobSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  images: {
-    type: [String],
+  image: {
+    type: String,
     required: false,
   },
   completed: {

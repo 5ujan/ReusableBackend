@@ -42,10 +42,10 @@ const createJob = async (req, res, next) => {
   if (user) {
     if (user.isOrg === true) {
       const { title, desc } = req.body;
-      newJob = await CommunityJob.create({ title, desc, createdBy: user._id });
+      newJob = await CommunityJob.create({ title, desc, createdBy: user._id, image });
     } else {
       const { title, desc, pay } = req.body;
-      newJob = await PaidJob.create({ title, desc, pay, createdBy: user._id });
+      newJob = await PaidJob.create({ title, desc, pay, createdBy: user._id, image });
     }
 
     res.status(200).json({
