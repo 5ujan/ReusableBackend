@@ -4,7 +4,7 @@ const PaidJobSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, "Title is required"],
-    minlength: 10,
+    minlength: 5,
     maxlength: 40,
   },
   desc: {
@@ -15,10 +15,10 @@ const PaidJobSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  pay: {
-    type: Number,
-    required: true,
-  },
+  // pay: {
+  //   type: Number,
+  //   required: true,
+  // },
   image: {
     type: String,
     required: false,
