@@ -35,9 +35,7 @@ const getJob = async (req, res, next) => {
 };
 
 const createJob = async (req, res, next) => {
-  console.log(req);
   const user = await User.findById(req.body.user.userID);
-  console.log(user);
   let newJob;
   if (user) {
     if (user.isOrg === true) {
