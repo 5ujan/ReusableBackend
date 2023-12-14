@@ -28,6 +28,9 @@ const CommunityJobSchema= new mongoose.Schema({
     },
     applications:{
         type:[String]
+    },
+    location:{
+        type:[Object]
     }
 
 })

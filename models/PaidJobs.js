@@ -34,6 +34,9 @@ const PaidJobSchema = new mongoose.Schema({
   applications: {
     type: [String],
     required: false
+  },
+  location:{
+    type:[Object]
   }
 });
 
