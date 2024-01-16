@@ -3,13 +3,14 @@ const express = require('express')
 const app= express();
 
 //middlewares
+const passport = require('passport')
 const connectDB=require('./db/connect')
 const {errorHandler} = require('./middleware/handleErrors')
 const authRouter= require("./routes/auth");
 const mainRouter= require("./routes/main");
 const userRouter= require("./routes/user");
 const authenticate = require('./middleware/authentication');
-
+require('./g-auth')
 
 app.use(express.json({limit: '25mb'}));
 app.use('/',  authRouter)         //login or register, doesn't require authentication

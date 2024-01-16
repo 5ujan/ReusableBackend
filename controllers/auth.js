@@ -1,5 +1,3 @@
-const User = require("../models/User")
-const {BadRequestError, NotFoundError, UnauthenticatedError} = require('../middleware/handleErrors')
 
 
 const register = async(req, res, next)=>{
