@@ -39,8 +39,8 @@ const createJob = async (req, res, next) => {
   let newJob;
   if (user) {
     if (user.isOrg === true) {
-      const { title, desc, image, pay, location } = req.body;
-      newJob = await CommunityJob.create({ title, desc, createdBy: user._id, image, pay, location });
+      const { title, desc, image, location } = req.body;
+      newJob = await CommunityJob.create({ title, desc, createdBy: user._id, image, location });  
     } else {
       const { title, desc, pay, image, location } = req.body;
       newJob = await PaidJob.create({ title, desc, pay, createdBy: user._id, image, pay, location});
@@ -135,9 +135,7 @@ module.exports = {
   getCommunityJobs,
   getPaidJobs,
   createJob,
-
   getJob,
-
   applyToJob,
   closeJob,
 };
