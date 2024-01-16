@@ -22,15 +22,13 @@ app.use(errorHandler);
 const start=async()=>{
     try {
         const port = 5000
-        await connectDB(process.env.MONGO_URI)
+        await connectDB(process.env.MONGO_URI);
         app.listen(port, ()=>{
-            console.log("server listening on port "+port)
-            
+            console.log(`Server listening on port ${port}.`)
         })
     }
     catch (error) {
         errorHandler(error);
     }
 }
-    
 start()
