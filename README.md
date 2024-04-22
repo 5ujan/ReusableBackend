@@ -21,4 +21,4 @@ Advanced cloudinary image upload mechanism for achieving temporary links to modi
 - needs two folders in the cloudinary storage, temp and final, temp cleared after each post only transferring finalized images.
 
 ## Password-based Authentication
-Check ```password-login``` branch for password based authentication 
+Check [password-login](https://github.com/5ujan/ReusableBackend/tree/password-login) branch for password based authentication 
