@@ -6,7 +6,7 @@ The default template to kickstart your projects
 ## Google OAuth 2.0
 Clone the ```main``` branch if you want to implement google oauth2.0 
 
-```git clone https://github.com/5ujan/ReusableBackend``` 
+```git clone https://github.com/5ujan/ReusableBackend.git``` 
 
 and get started.
 ### Passport & JWT
